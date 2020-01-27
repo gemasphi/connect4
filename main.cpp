@@ -44,7 +44,6 @@ unsigned long long getTimeMicrosec() {
  *  will generate an error message to standard error and an empty line to standard output.
  */
 int main(int argc, char** argv) {
-
   Solver solver;
 
   bool weak = false;
