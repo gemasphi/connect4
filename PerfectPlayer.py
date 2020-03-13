@@ -1,11 +1,14 @@
 from build.perfect_player import Position, Solver
+import numpy as np
+import pdb;
 
 class PerfectPlayer:
 	def __init__(self, book_dir):
 		self.solver = Solver()
 		self.solver.loadBook(book_dir)
 
-	def get_position_scores(self, current_position):
+	def get_position_scores(self, state):
+		current_position = self._convert_state(state)
 		scores = []
 		for move in range(7):
 			pos = Position()
@@ -23,3 +26,6 @@ class PerfectPlayer:
 			scores.append(score)
 
 		return scores
+
+	def _convert_state(self, actions):			
+		return ''.join(map(str, actions[np.nonzero(actions)]))
