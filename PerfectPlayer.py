@@ -7,7 +7,7 @@ class PerfectPlayer:
 		self.solver.loadBook(book_dir)
 		self.pos_cache = {}
 
-	def get_position_scores(self, state):
+	def get_one_position_score(self, state):
 		current_position = self._convert_state(state)
 
 		if current_position in self.pos_cache:
@@ -32,6 +32,21 @@ class PerfectPlayer:
 		self.pos_cache[current_position] = (scores, *self._position_evaluation(scores))
 		return self.pos_cache[current_position]
 
+	def get_position_scores(self, state):
+		print(state)
+		if state.ndim > 1:
+			score_b, v_b, p_b = [], [], []
+			for s in state:
+				score, v, p = self.get_one_position_score(s)
+				score_b.append(score)
+				v_b.append(v)
+				p_b.append(p)
+			return np.array(score_b), np.array(v_b), np.array(p_b) 
+		else:
+			score, v, p = self.get_one_position_score(state)
+			return np.array([score]), np.array([v]), np.array([p])
+		
+
 	def _convert_state(self, actions):			
 		return ''.join(map(str, actions[np.nonzero(actions)]))
 
@@ -39,4 +54,4 @@ class PerfectPlayer:
 		scores = np.array(scores)
 		value = np.sign(np.max(scores))
 		policy = (scores == scores.max()).astype(int)
-		return value, policy/policy.sum()
+		return np.array([value]), np.array(policy/policy.sum())
