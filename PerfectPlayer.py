@@ -1,14 +1,18 @@
 from build.perfect_player import Position, Solver
 import numpy as np
-import pdb;
 
 class PerfectPlayer:
 	def __init__(self, book_dir):
 		self.solver = Solver()
 		self.solver.loadBook(book_dir)
+		self.pos_cache = {}
 
 	def get_position_scores(self, state):
 		current_position = self._convert_state(state)
+
+		if current_position in self.pos_cache:
+			return self.pos_cache[current_position]
+
 		scores = []
 		for move in range(7):
 			pos = Position()
@@ -25,7 +29,14 @@ class PerfectPlayer:
 
 			scores.append(score)
 
-		return scores
+		self.pos_cache[current_position] = (scores, *self._position_evaluation(scores))
+		return self.pos_cache[current_position]
 
 	def _convert_state(self, actions):			
 		return ''.join(map(str, actions[np.nonzero(actions)]))
+
+	def _position_evaluation(self, scores):
+		scores = np.array(scores)
+		value = np.sign(np.max(scores))
+		policy = (scores == scores.max()).astype(int)
+		return value, policy/policy.sum()
